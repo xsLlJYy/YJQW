@@ -221,71 +221,6 @@
             background: rgba(0, 0, 0, 0.5);
             box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
         }
-        .video-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 40;
-            background: rgba(0, 0, 0, 0.75);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease;
-        }
-        .video-overlay.faded-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .video-box {
-            width: min(800px, 85vw);
-            max-height: 80vh;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
-        }
-        .video-box video {
-            display: block;
-            width: 100%;
-            height: auto;
-            max-height: 80vh;
-            object-fit: contain;
-        }
-        .video-tip {
-            margin-top: 14px;
-            text-align: center;
-            color: #f5f1e6;
-            font-size: 14px;
-            letter-spacing: 3px;
-            opacity: 0.75;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-        }
-        .video-close {
-            position: absolute;
-            top: -16px;
-            right: -16px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            color: #ffffff;
-            font-size: 22px;
-            line-height: 1;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 41;
-            transition: all 0.25s ease;
-        }
-        .video-close:hover {
-            background: rgba(200, 0, 0, 0.85);
-            border-color: #ffffff;
-            transform: scale(1.1);
-        }
-        .video-box-wrap {
-            position: relative;
-        }
     </style>
 </head>
 <body>
@@ -298,25 +233,6 @@
         <div class="bg-particle" style="left:62%; animation-delay:6.5s;  width:4px;height:4px;"></div>
         <div class="bg-particle" style="left:76%; animation-delay:3.0s;  width:6px;height:6px;"></div>
         <div class="bg-particle" style="left:90%; animation-delay:5.5s;  width:3px;height:3px;"></div>
-    </div>
-    <div class="video-overlay" id="video-overlay">
-        <div>
-            <div class="video-box-wrap">
-                <div class="video-box">
-                    <video id="intro-video"
-                           src="../video/3.mp4"
-                           controls
-                           preload="metadata"
-                           playsinline
-                           webkit-playsinline
-                           x5-playsinline
-                           x5-video-player-type="h5"
-                           x5-video-player-fullscreen="false"></video>
-                </div>
-                <button class="video-close" id="video-close" title="关闭视频">×</button>
-            </div>
-            <div class="video-tip">视频播放完毕将自动进入 · 饮酒其五 · 也可点击 × 随时关闭</div>
-        </div>
     </div>
 
     <a href="index.html" class="back">← 返回</a>
@@ -341,10 +257,6 @@
             <div class="click-hint" id="click-hint">点击此处 · 字落如雨</div>
         </div>
     </div>
-    <script>
-        // 在 common.js 加载前先设置视频互斥标记，防止BGM抢先启动
-        window.__videoPlaying = true;
-    </script>
     <script src="common.js"></script>
 
     <script>
@@ -372,14 +284,11 @@
             const textRef = document.getElementById("ft-text");
             const canvasContainerRef = document.getElementById("ft-canvas");
             const clickHint = document.getElementById("click-hint");
-            const videoOverlay = document.getElementById("video-overlay");
-            const introVideo = document.getElementById("intro-video");
             const panels = [
                 document.getElementById("panel-chudu"),
                 document.getElementById("panel-jingdu"),
                 document.getElementById("panel-ganwu")
             ];
-            let videoPlaying = true;
             const newHTML = lines
                 .map((line) => {
                     const cls =
@@ -426,57 +335,7 @@
             let urlParams = new URLSearchParams(window.location.search);
             const isDirect = urlParams.get("direct") === "1";
 
-            function pauseBgForVideo() {
-                // 多次尝试暂停，防止 common.js 的重试机制又把它启动了
-                if (typeof window.__pauseBg === "function") {
-                    window.__pauseBg();
-                }
-                setTimeout(function () {
-                    if (typeof window.__pauseBg === "function") window.__pauseBg();
-                }, 200);
-                setTimeout(function () {
-                    if (typeof window.__pauseBg === "function") window.__pauseBg();
-                }, 600);
-                setTimeout(function () {
-                    if (typeof window.__pauseBg === "function") window.__pauseBg();
-                }, 1200);
-            }
-
-            function hideVideoAndPlay() {
-                videoOverlay.classList.add("faded-out");
-                setTimeout(() => {
-                    videoOverlay.style.display = "none";
-                }, 500);
-                videoPlaying = false;
-                window.__videoPlaying = false; // 清除视频互斥标记
-                if (typeof window.__resumeBg === "function") window.__resumeBg();
-                clickHint.classList.remove("hidden");
-            }
-            introVideo.addEventListener("ended", hideVideoAndPlay);
-            introVideo.addEventListener("play", function () {
-                window.__videoPlaying = true; // 确保互斥标记
-                pauseBgForVideo();
-            });
-            introVideo.addEventListener("playing", function () {
-                window.__videoPlaying = true;
-                pauseBgForVideo();
-            });
-            introVideo.addEventListener("pause", function () {
-                // 只有当视频overlay已隐藏（即用户主动关闭）时才恢复BGM
-                // 否则保持暂停，避免用户手动点暂停后BGM突然响起
-                if (!videoPlaying || videoOverlay.style.display === "none") {
-                    window.__videoPlaying = false;
-                    if (typeof window.__resumeBg === "function") window.__resumeBg();
-                }
-            });
-            // 关闭按钮：随时关闭视频并进入文字掉落
-            document.getElementById("video-close").addEventListener("click", function () {
-                introVideo.pause();
-                hideVideoAndPlay();
-            });
-
             function handleTrigger() {
-                if (videoPlaying) return;
                 if (!effectStarted) {
                     effectStarted = true;
                     clickHint.classList.add("hidden");
@@ -488,18 +347,8 @@
             containerRef.addEventListener("click", handleTrigger);
 
             if (isDirect) {
-                videoOverlay.style.display = "none";
-                videoPlaying = false;
-                window.__videoPlaying = false; // direct模式无视频，允许BGM
                 clickHint.classList.add("hidden");
                 showPanels();
-            } else {
-                window.__videoPlaying = true;
-                pauseBgForVideo();
-                introVideo.play().catch(function () {
-                    // 自动播放失败（可能需要用户点击），但仍保持互斥标记
-                    // 当用户点击视频启动播放时，play事件会再次暂停BGM
-                });
             }
             document.addEventListener("dragstart", (e) => e.preventDefault());
         })();
