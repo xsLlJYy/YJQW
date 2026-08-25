@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精读 · 饮酒其五</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+        }
+        body {
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+            color: #2c2a25;
+            overflow-x: hidden;
+        }
+        /* ===== 动态背景（Ken Burns + 粒子浮动）===== */
+        .bg-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .bg-kenburns {
+            position: absolute;
+            inset: 0;
+            background: url("../images/4.jpg") no-repeat center center;
+            background-size: cover;
+            animation: kbZoom 32s ease-in-out infinite alternate;
+            transform-origin: center;
+            filter: saturate(1.08);
+        }
+        @keyframes kbZoom {
+            0%   { transform: scale(1.0) translate(0, 0); }
+            100% { transform: scale(1.1) translate(-10px, 6px); }
+        }
+        .bg-particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #e8c06a;
+            border-radius: 50%;
+            opacity: 0.55;
+            box-shadow: 0 0 4px #e8c06a;
+            animation: bgFloat 14s linear infinite;
+        }
+        @keyframes bgFloat {
+            0%   { transform: translateY(110vh) translateX(0); opacity: 0; }
+            10%  { opacity: 0.55; }
+            90%  { opacity: 0.55; }
+            100% { transform: translateY(-10vh) translateX(30px); opacity: 0; }
+        }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(248, 240, 220, 0.85) 0%,
+                rgba(240, 230, 200, 0.78) 50%,
+                rgba(248, 240, 220, 0.85) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .back {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            font-size: 19px;
+            color: #2c2a25;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid rgba(44, 42, 37, 0.5);
+            border-radius: 20px;
+            background: rgba(255, 248, 225, 0.65);
+            z-index: 50;
+            backdrop-filter: blur(2px);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+        .back:hover {
+            background: rgba(255, 248, 225, 0.9);
+            box-shadow: 0 0 12px rgba(120, 90, 30, 0.3);
+        }
+        .hero {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 28vh;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 22px;
+        }
+        .hero-label {
+            font-size: 20px;
+            letter-spacing: 8px;
+            color: #6b532c;
+            margin-bottom: 12px;
+            opacity: 0.88;
+        }
+        .hero-title {
+            font-size: 59px;
+            letter-spacing: 14px;
+            color: #2c2a25;
+            font-weight: bold;
+            padding-bottom: 18px;
+            position: relative;
+        }
+        .hero-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent, rgba(107, 83, 44, 0.65), transparent);
+        }
+        .hero-sub {
+            margin-top: 14px;
+            font-size: 22px;
+            letter-spacing: 6px;
+            color: #6b532c;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 960px;
+            margin: 0 auto 80px;
+            padding: 0 28px;
+        }
+        .section {
+            margin-bottom: 52px;
+            background: rgba(255, 250, 235, 0.82);
+            border: 1px solid rgba(107, 83, 44, 0.25);
+            border-radius: 14px;
+            padding: 36px 40px 40px;
+            box-shadow: 0 6px 24px rgba(44, 42, 37, 0.08);
+            backdrop-filter: blur(3px);
+            position: relative;
+        }
+        .section::before {
+            content: attr(data-seal);
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            font-weight: bold;
+            color: #fff8e1;
+            background: #8b2c2c;
+            border-radius: 6px;
+            transform: rotate(-4deg);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }
+        .sec-head {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(107, 83, 44, 0.4);
+        }
+        .sec-num {
+            font-size: 47px;
+            font-weight: bold;
+            color: #8b2c2c;
+            margin-right: 16px;
+            line-height: 1;
+            font-family: 'Georgia', serif;
+        }
+        .sec-title {
+            font-size: 35px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #2c2a25;
+        }
+        .sec-en {
+            margin-left: 14px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: #8a7451;
+            font-family: 'Georgia', serif;
+        }
+
+        .sec-body {
+            font-size: 23px;
+            line-height: 2;
+            color: #2c2a25;
+            letter-spacing: 0.5px;
+            text-align: justify;
+        }
+        .sec-body p { margin-bottom: 16px; }
+        .sec-body p:last-child { margin-bottom: 0; }
+
+        .kw { color: #8b2c2c; font-weight: bold; }
+        .bg-block {
+            margin-top: 18px;
+            padding: 20px 24px;
+            background: rgba(107, 83, 44, 0.08);
+            border-left: 4px solid #8b2c2c;
+            border-radius: 4px 8px 8px 4px;
+        }
+        .bg-label {
+            display: inline-block;
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: #fff8e1;
+            background: #6b532c;
+            padding: 4px 14px 5px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+        .poem-block {
+            margin-top: 14px;
+            padding: 22px 28px;
+            background: rgba(255, 250, 230, 0.92);
+            border: 1px dashed rgba(107, 83, 44, 0.45);
+            border-radius: 10px;
+            position: relative;
+        }
+        .poem-block-title {
+            font-size: 21px;
+            letter-spacing: 4px;
+            color: #8b2c2c;
+            text-align: center;
+            margin-bottom: 16px;
+            font-weight: bold;
+        }
+        .poem {
+            font-size: 31px;
+            line-height: 2.2;
+            color: #2c2a25;
+            letter-spacing: 6px;
+            text-align: center;
+        }
+        .poem-line {
+            display: block;
+            margin-bottom: 4px;
+        }
+        .poem-line:last-child { margin-bottom: 0; }
+        .cw {
+            color: #b22222;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 1.5px dotted #b22222;
+            padding: 0 2px;
+            transition: color 0.25s ease, transform 0.25s ease;
+        }
+        .cw:hover {
+            color: #8b0000;
+            transform: translateY(-2px);
+        }
+        .line-btn {
+    display: block;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    padding: 4px 8px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    transition: background 0.25s ease;
+        }
+        .line-btn:hover {
+            background: rgba(107, 83, 44, 0.12);
+        }
+        .line-btn.opened {
+            background: rgba(107, 83, 44, 0.18);
+        }
+        .line-btn .src {
+            display: inline;
+        }
+        .line-btn .dst {
+            display: block;
+            margin-top: 6px;
+            font-size: 23px;
+            color: #6b532c;
+            letter-spacing: 2px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.5s ease, max-height 0.5s ease;
+            font-style: italic;
+        }
+        .line-btn.opened .dst {
+            opacity: 1;
+            max-height: 80px;
+        }
+        .cw-tip {
+            position: fixed;
+            background: #fffbe6;
+            border: 1.5px solid #8b2c2c;
+            color: #2c2a25;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 20px;
+            line-height: 1.7;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            max-width: 260px;
+            z-index: 40;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .cw-tip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .tab-bar {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin: 16px 0 0;
+        }
+        .tab-bar .tab {
+            padding: 8px 28px;
+            font-size: 20px;
+            letter-spacing: 4px;
+            border: 1px solid rgba(107, 83, 44, 0.4);
+            background: rgba(255, 250, 230, 0.6);
+            cursor: pointer;
+            color: #6b532c;
+            transition: all 0.3s ease;
+        }
+        .tab-bar .tab:first-child { border-radius: 20px 0 0 20px; }
+        .tab-bar .tab:last-child  { border-radius: 0 20px 20px 0; }
+        .tab-bar .tab.active {
+            background: #6b532c;
+            color: #fff8e1;
+        }
+        .qa {
+            margin-top: 18px;
+            padding: 18px 22px;
+            background: rgba(255, 250, 230, 0.88);
+            border: 1px solid rgba(107, 83, 44, 0.28);
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        .qa:last-child { margin-bottom: 0; }
+        .qa-q {
+            font-size: 23px;
+            line-height: 1.9;
+            color: #2c2a25;
+            margin-bottom: 12px;
+        }
+        .qa-q .qno {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            color: #fff8e1;
+            background: #8b2c2c;
+            border-radius: 50%;
+            font-size: 19px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .qa-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .qa-input-row input[type="text"] {
+            flex: 1;
+            min-width: 120px;
+            padding: 8px 14px;
+            font-size: 21px;
+            font-family: inherit;
+            border: 1px solid rgba(107, 83, 44, 0.4);
+            border-radius: 6px;
+            background: #fffdf4;
+            color: #2c2a25;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        .qa-input-row input[type="text"]:focus {
+            border-color: #8b2c2c;
+            box-shadow: 0 0 0 3px rgba(139, 44, 44, 0.12);
+        }
+        .qa-input-row button {
+            padding: 8px 20px;
+            font-size: 19px;
+            font-family: inherit;
+            letter-spacing: 2px;
+            background: #6b532c;
+            color: #fff8e1;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .qa-input-row button:hover {
+            background: #8b2c2c;
+        }
+        .qa-input-row button.reveal {
+            background: #5a4a2e;
+        }
+
+        .qa-answer {
+            display: none;
+            padding: 14px 18px;
+            background: rgba(139, 44, 44, 0.07);
+            border-left: 3px solid #8b2c2c;
+            border-radius: 4px;
+            font-size: 21px;
+            line-height: 1.95;
+            color: #2c2a25;
+            animation: slideDown 0.4s ease;
+        }
+        .qa-answer.show {
+            display: block;
+        }
+        .qa-answer .ref {
+            display: block;
+            margin-top: 8px;
+            color: #6b532c;
+            font-style: italic;
+            font-size: 20px;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .foot {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 30px 0 50px;
+            font-size: 18px;
+            letter-spacing: 4px;
+            color: #6b532c;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-wrap"><div class="bg-kenburns"></div></div>
+    <div class="bg-particles">
+        <div class="bg-particle" style="left:10%; animation-delay:0.3s;   width:4px;height:4px;"></div>
+        <div class="bg-particle" style="left:25%; animation-delay:2.2s;   width:6px;height:6px;"></div>
+        <div class="bg-particle" style="left:40%; animation-delay:4.8s;   width:3px;height:3px;"></div>
+        <div class="bg-particle" style="left:55%; animation-delay:1.8s;   width:5px;height:5px;"></div>
+        <div class="bg-particle" style="left:68%; animation-delay:6.2s;   width:4px;height:4px;"></div>
+        <div class="bg-particle" style="left:82%; animation-delay:3.7s;   width:6px;height:6px;"></div>
+        <div class="bg-particle" style="left:94%; animation-delay:5.0s;   width:3px;height:3px;"></div>
+    </div>
+    <div class="overlay"></div>
+    <a href="饮酒其五.html?direct=1" class="back">← 返回</a>
+
+    <div class="hero">
+        <div class="hero-label">精 读 篇</div>
+        <div class="hero-title">饮酒·其五</div>
+        <div class="hero-sub">陶 渊 明</div>
+    </div>
+
+    <div class="content">
+        <section class="section" data-seal="肆">
+            <div class="sec-head">
+                <span class="sec-num">01</span>
+                <span class="sec-title">写作背景</span>
+                <span class="sec-en">BACKGROUND</span>
+            </div>
+            <div class="sec-body">
+
+                <div class="bg-block">
+                    <span class="bg-label">时代背景 · 东晋</span>
+                    <p>
+                        东晋时代，社会<span class="kw">长期分裂、动荡不安</span>，统治者荒淫奢侈，
+                        政治腐败黑暗。当时文人们<span class="kw">惧谈政治</span>，
+                        许多文人以<span class="kw">游山玩水、隐逸不仕、酗酒放浪、玄学清谈</span>
+                        等方式来表示自己没有政治野心，免得被统治者猜忌，以招来人身伤害。
+                    </p>
+                </div>
+
+                <div class="bg-block">
+                    <span class="bg-label">创作缘起 · 辞官归隐</span>
+                    <p>
+                        本诗即是陶渊明<span class="kw">"不为五斗米折腰"</span>
+                        辞官归隐之后所作，于田园之间，借酒抒怀，写下了这一组千古名篇。
+                    </p>
+                </div>
+
+            </div>
+        </section>
+        <section class="section" data-seal="伍">
+            <div class="sec-head">
+                <span class="sec-num">02</span>
+                <span class="sec-title">疏通诗意</span>
+                <span class="sec-en">ILLUMINATE</span>
+            </div>
+            <div class="sec-body">
+                <div class="tab-bar">
+                    <div class="tab active" id="tab-cw">字词解释</div>
+                    <div class="tab" id="tab-tr">翻译</div>
+                </div>
+                <div class="poem-block" id="view-cw">
+                    <div class="poem-block-title">※ 点击红字查看解释</div>
+                    <div class="poem" id="poem-cw">
+                        <span class="poem-line">
+                            <span class="cw" data-exp="结：建造、构筑；庐：简陋的房屋；结庐：建造房舍。">结庐</span>
+                            在
+                            <span class="cw" data-exp="人境：喧嚣扰攘的尘世。">人境</span>
+                            ，而无车马
+                            <span class="cw" data-exp="喧：喧嚣。">喧</span>
+                            。
+                        </span>
+                        <span class="poem-line">
+                            问君何能
+                            <span class="cw" data-exp="尔：如此，这样。">尔</span>
+                            ？心
+                            <span class="cw" data-exp="（心远：远离尘世；）此处可理解为精神超脱。">远</span>
+                            地自偏。
+                        </span>
+                        <span class="poem-line">
+                            采菊东篱下，
+                            <span class="cw" data-exp="悠然：闲适淡泊的样子；然：……的样子。">悠然</span>
+                            见
+                            <span class="cw" data-exp="（南山：庐山，在陶渊明居所南面。）">南山</span>
+                            。
+                        </span>
+                        <span class="poem-line">
+                            <span class="cw" data-exp="山气：山间的云气。">山气</span>
+                            日
+                            <span class="cw" data-exp="夕：傍晚。">夕</span>
+                            佳，飞鸟相与还。
+                        </span>
+                        <span class="poem-line">
+                            此中有
+                            <span class="cw" data-exp="（真意：生命的真谛，人生的真意。）">真意</span>
+                            ，
+                            <span class="cw" data-exp="欲辨已忘言：想要分辨清楚，却已忘了怎样表达；辨：分辨；言：表达。">欲辨已忘言</span>
+                            。
+                        </span>
+                    </div>
+                </div>
+
+                <span style="text-align: center">
+                </span>
+                <div class="poem-block" id="view-tr" style="display:none;">
+                    <div class="poem-block-title">※ 点击诗句查看翻译</div>
+                    <div class="poem" id="poem-tr">
+                        <span style="text-align: center">
+                        <button class="line-btn" data-dst="在喧嚣扰攘的尘世建造房舍，却听不到车马的喧嚣。">
+                            <span class="src">结庐在人境，而无车马喧。</span>
+                            <span class="dst">在喧嚣扰攘的尘世建造房舍，却听不到车马的喧嚣。</span>
+                        </button>
+                        <button class="line-btn" data-dst="问我为什么能这样？（只要）心里远离了尘世，所居之处自然就变得僻静。">
+                            <span class="src">问君何能尔？心远地自偏。</span>
+                            <span class="dst">问我为什么能这样？（只要）心里远离了尘世，所居之处自然就变得僻静。</span>
+                        </button>
+                        <button class="line-btn" data-dst="在东边的篱笆下采摘菊花，闲适淡泊间，那远处的南山映入眼帘。">
+                            <span class="src">采菊东篱下，悠然见南山。</span>
+                            <span class="dst">在东边的篱笆下采摘菊花，闲适淡泊间，那远处的南山映入眼帘。</span>
+                        </button>
+                        <button class="line-btn" data-dst="傍晚山间的云气更加美好，成群的鸟儿结伴飞回山林。">
+                            <span class="src">山气日夕佳，飞鸟相与还。</span>
+                            <span class="dst">傍晚山间的云气更加美好，成群的鸟儿结伴飞回山林。</span>
+                        </button>
+                        </span>
+                      <span style="text-align: center">
+                      <button class="line-btn" data-dst="在这之中蕴含着生命的真谛，想要分辨清楚，却已忘了怎样表达。">
+                          <span class="src" style="text-align: center">此中有真意，欲辨已忘言。</span>
+                      <span class="dst" style="text-align: center">在这之中蕴含着生命的真谛，想要分辨清楚，却已忘了怎样表达。</span> </button>
+                    </span></div>
+                </div>
+
+            </div>
+        </section>
+        <section class="section" data-seal="陆">
+            <div class="sec-head">
+                <span class="sec-num">03</span>
+                <span class="sec-title">问题思考</span>
+                <span class="sec-en">REFLECT</span>
+            </div>
+            <div class="sec-body">
+
+                <div class="qa" data-q="1">
+                    <div class="qa-q">
+                        <span class="qno">1</span>
+                        反复朗读后思考，本诗的关键词是？
+                    </div>
+                    <div class="qa-input-row">
+                        <input type="text" placeholder="请输入你认为的关键词……" />
+                        <button class="reveal">提交</button>
+                    </div>
+                    <div class="qa-answer">
+                        <strong>参考答案：</strong><span class="kw">悠然</span>
+                        <span class="ref">—— 一个"悠然"，撑起了全诗的灵魂。</span>
+                    </div>
+                </div>
+
+                <div class="qa" data-q="2">
+                    <div class="qa-q">
+                        <span class="qno">2</span>
+                        何处体现出"悠然"？
+                    </div>
+                    <div class="qa-input-row">
+                        <input type="text" placeholder="写出体现悠然的诗句……" />
+                        <button class="reveal">提交</button>
+                    </div>
+                    <div class="qa-answer">
+                        <strong>参考答案：</strong><br>
+                        <span class="kw">结庐在人境，而无车马喧。问君何能尔？心远地自偏。</span>
+                        <br><br>
+                        <strong>参考赏析：</strong>
+                        <span class="ref">1. 高车骏马往往用于官场应酬，代表功利性的交往。</span>
+                        <span class="ref">2. 宋·陈岩肖曾写道："寄心于远，则虽在人境，而车马亦不能喧之；心有蒂芥，则虽擅一壑，而逢车马，亦不免惊猜也。"</span>
+                        <span class="ref">3. 小隐隐于山，中隐隐于市，大隐隐于朝。</span>
+                        <br>
+                        <strong>分析：</strong>运用设问，自问自答中表现诗人看淡名利、心情闲适，所以即使身处闹市，也显得偏僻安静。
+                    </div>
+                </div>
+
+                <div class="qa" data-q="3">
+                    <div class="qa-q">
+                        <span class="qno">3</span>
+                        "采菊东篱下，悠然见南山。"表达了怎样的意象？
+                    </div>
+                    <div class="qa-input-row">
+                        <input type="text" placeholder="写下你的理解……" />
+                        <button class="reveal">提交</button>
+                    </div>
+                    <div class="qa-answer">
+                        <strong>参考赏析：</strong>
+                        <span class="ref">1. 古人视菊为一种高雅而有气节的花卉，因她开在众芳凋落的秋天，故屈原就有"夕餐秋菊之落英"的话。</span>
+                        <span class="ref">2. 晋陶渊明独爱菊……菊，花之隐逸者也。——周敦颐《爱莲说》</span>
+                        <span class="ref">3. 三径就荒，松菊犹存。——陶渊明《归去来兮辞》</span>
+                        <br>
+                        <strong>分析：</strong>诗人喜爱菊花，正是喜爱菊花的<span class="kw">不与百花争春</span>，
+                        独爱其<span class="kw">淡泊宁静、与世无争</span>的品格。
+                    </div>
+                </div>
+
+                <div class="qa" data-q="4">
+                    <div class="qa-q">
+                        <span class="qno">4</span>
+                        "悠然见南山"，"见"字能否改为"望"字？
+                    </div>
+                    <div class="qa-input-row">
+                        <input type="text" placeholder="写下你的判断与理由……" />
+                        <button class="reveal">提交</button>
+                    </div>
+                    <div class="qa-answer">
+                        <strong>参考：</strong>
+                        <span class="ref">因采菊而见山，境与意会，此句最有妙处。近岁俗本皆作"望南山"，则此一篇神气都索然矣。——苏轼</span>
+                        <br>
+                        <strong>分析：</strong><span class="kw">不能改。</span>
+                        "见"字写出了诗人<span class="kw">物我合一、悠然忘我</span>的境界，与全诗悠然意境吻合；
+                        "望"更有目的性，更像是有意为之，破坏了诗歌自然而然的意境。
+                    </div>
+                </div>
+
+                <div class="qa" data-q="5">
+                    <div class="qa-q">
+                        <span class="qno">5</span>
+                        "山气日夕佳，飞鸟相与还。"表达了怎样的意象？
+                    </div>
+                    <div class="qa-input-row">
+                        <input type="text" placeholder="写下你的理解……" />
+                        <button class="reveal">提交</button>
+                    </div>
+                    <div class="qa-answer">
+                        <strong>参考：</strong>
+                        <span class="ref">少无适俗韵，性本爱丘山，误落尘网中，一去三十年。</span>
+                        <span class="ref">羁鸟恋旧林，池鱼思故渊。开荒南野际，守拙归园田。</span>
+                        <span class="ref">——陶渊明《归园田居》（其一）</span>
+                        <br>
+                        <strong>分析：</strong>诗人实际是以"<span class="kw">飞鸟</span>"自喻，
+                        借飞鸟<span class="kw">自在结伴回归山林</span>来表现辞官归隐后的<span class="kw">自在心境</span>。
+                    </div>
+                </div>
+
+                <div class="qa" data-q="6">
+                    <div class="qa-q">
+                        <span class="qno">6</span>
+                        "山气日夕佳，飞鸟相与还。"请从景与情的角度，比较这句诗和杜甫的"荡胸生层云，决眦入归鸟"。
+                    </div>
+                    <div class="qa-input-row">
+                        <input type="text" placeholder="写下你的比较分析……" />
+                        <button class="reveal">提交</button>
+                    </div>
+                    <div class="qa-answer">
+                        <strong>分析：</strong>两首诗都写到了<span class="kw">山中云雾</span>和<span class="kw">归巢飞鸟</span>。
+                        <br><br>
+                        陶渊明：通过描绘<span class="kw">傍晚山间云气美好、群鸟结伴而归</span>的场景，
+                        展现了<span class="kw">田园景色的优美</span>和<span class="kw">隐居的悠闲自得</span>。
+                        <br><br>
+                        杜甫《望岳》：望着层层云气，心胸摇荡；睁大眼睛远望归鸟回旋入山，眼角好像要裂开一样。
+                        <span class="kw">"荡胸""决眦"</span>体现了诗人<span class="kw">自信的姿态</span>，
+                        为后面"<span class="kw">一览众山小</span>"的豪情壮志做铺垫。
+                    </div>
+                </div>
+
+                <div class="qa" data-q="7">
+                    <div class="qa-q">
+                        <span class="qno">7</span>
+                        "此中有真意，欲辨已忘言。"诗人连点题都如此"佛系"，你能帮他言明那份只可意会不可言传的"真意"到底是什么吗？
+                    </div>
+                    <div class="qa-input-row">
+                        <input type="text" placeholder="用自己的话说说"真意"……" />
+                        <button class="reveal">提交</button>
+                    </div>
+                    <div class="qa-answer">
+                        <strong>分析：</strong>"<span class="kw">真意</span>"是陶渊明领会到的<span class="kw">返璞归真</span>的人生真谛。
+                        <br><br>
+                        诗歌通过描写诗人隐居生活的情趣，表现了诗人<span class="kw">远离世俗、悠然自得</span>的心情，
+                        表达了诗人<span class="kw">厌恶官场生活</span>，决心<span class="kw">归隐田园、超脱世俗</span>的人生追求。
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <div class="foot">— 精读既深，可返感悟 —</div>
+    <div class="cw-tip" id="cw-tip"></div>
+    <script src="common.js"></script>
+    <script>
+        (function () {
+            const tabCw = document.getElementById('tab-cw');
+            const tabTr = document.getElementById('tab-tr');
+            const viewCw = document.getElementById('view-cw');
+            const viewTr = document.getElementById('view-tr');
+            tabCw.addEventListener('click', () => {
+                tabCw.classList.add('active');
+                tabTr.classList.remove('active');
+                viewCw.style.display = 'block';
+                viewTr.style.display = 'none';
+                hideTip();
+            });
+            tabTr.addEventListener('click', () => {
+                tabTr.classList.add('active');
+                tabCw.classList.remove('active');
+                viewTr.style.display = 'block';
+                viewCw.style.display = 'none';
+                hideTip();
+            });
+            const tip = document.getElementById('cw-tip');
+            let currentCw = null;
+            function hideTip() {
+                tip.classList.remove('show');
+                if (currentCw) currentCw.style.color = '';
+                currentCw = null;
+            }
+            document.querySelectorAll('.cw').forEach((el) => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const text = el.dataset.exp;
+                    if (!text) return;
+                    if (currentCw === el) { hideTip(); return; }
+                    hideTip();
+                    currentCw = el;
+                    el.style.color = '#8b0000';
+                    tip.textContent = text;
+                    const rect = el.getBoundingClientRect();
+                    const tipW = 240;
+                    const left = Math.max(8, rect.left + rect.width / 2 - tipW / 2);
+                    const top  = rect.bottom + 8; 
+                    tip.style.left = left + 'px';
+                    tip.style.top  = top + 'px';
+                    tip.style.maxWidth = tipW + 'px';
+                    tip.classList.add('show');
+                });
+            });
+            document.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('cw')) hideTip();
+            });
+            document.querySelectorAll('.line-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    btn.classList.toggle('opened');
+                });
+            });
+            document.querySelectorAll('.qa').forEach((qa) => {
+                const input = qa.querySelector('input[type="text"]');
+                const btn = qa.querySelector('button.reveal');
+                const ans = qa.querySelector('.qa-answer');
+                btn.addEventListener('click', () => {
+                    ans.classList.toggle('show');
+                    btn.textContent = ans.classList.contains('show') ? '收起' : '提交';
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>饮酒·其五 — 陶渊明</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'STKaiti', 'KaiTi', serif;
+        }
+        /* ===== 动态背景（Ken Burns + 粒子浮动）===== */
+        .bg-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .bg-kenburns {
+            position: absolute;
+            inset: 0;
+            background: url("../images/22.jpg") no-repeat center center;
+            background-size: cover;
+            animation: kbZoom 28s ease-in-out infinite alternate;
+            transform-origin: center;
+            filter: saturate(1.05) brightness(0.95);
+        }
+        @keyframes kbZoom {
+            0%   { transform: scale(1.0) translate(0, 0); }
+            100% { transform: scale(1.1) translate(8px, -6px); }
+        }
+        .bg-particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0.5;
+            box-shadow: 0 0 6px #ffffff;
+            animation: bgFloat 13s linear infinite;
+        }
+        @keyframes bgFloat {
+            0%   { transform: translateY(110vh) translateX(0); opacity: 0; }
+            10%  { opacity: 0.5; }
+            90%  { opacity: 0.5; }
+            100% { transform: translateY(-10vh) translateX(-20px); opacity: 0; }
+        }
+        .ft-wrapper {
+            position: absolute;
+            left: 10vw;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 42vw;
+            max-width: 680px;
+            min-width: 300px;
+        }
+        .falling-text-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+            cursor: pointer;
+            height: 70vh;
+            max-height: 640px;
+            min-height: 360px;
+        }
+        .falling-text-target {
+            line-height: 1.6;
+            color: #ffffff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+            font-family: 'STKaiti', 'KaiTi', serif;
+            padding: 18px 12px 0;
+        }
+        .ft-line {
+            display: block;
+            text-align: center;
+            font-size: 30px;
+            line-height: 1.7;
+            margin-bottom: 6px;
+        }
+        .ft-title {
+            font-size: 50px;
+            letter-spacing: 6px;
+            margin-bottom: 14px;
+            line-height: 1.3;
+        }
+        .ft-author {
+            font-size: 30px;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+        }
+        .falling-text-target .word {
+            display: inline-block;
+            color: #ffffff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+            white-space: pre;
+        }
+        .falling-text-target .word.highlighted {
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .falling-text-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        .falling-text-target .word.falling {
+            animation: wordFall var(--fall-dur, 2.4s) cubic-bezier(.35,.6,.65,1) forwards;
+        }
+        @keyframes wordFall {
+            0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+            70%  { opacity: 1; }
+            100% { transform: translateY(var(--fall-y, 70vh)) rotate(var(--fall-rot, 180deg)); opacity: 0; }
+        }
+        .falling-text-canvas canvas {
+            display: block;
+        }
+        .click-hint {
+            position: absolute;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            font-size: 15px;
+            color: #ffffff;
+            letter-spacing: 4px;
+            opacity: 0.85;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+            pointer-events: none;
+            animation: hintPulse 2s ease-in-out infinite;
+            z-index: 5;
+            transition: opacity 0.4s ease;
+        }
+        .click-hint.hidden { opacity: 0; }
+        @keyframes hintPulse {
+            0%, 100% { opacity: 0.5; }
+            50%      { opacity: 0.95; }
+        }
+        .panels {
+            position: absolute;
+            right: 18vw;
+            top: 12vh;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            z-index: 20;
+        }
+        .panel {
+            width: 180px;
+            padding: 20px 10px 22px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            border-radius: 10px;
+            text-align: center;
+            color: #ffffff;
+            backdrop-filter: blur(2px);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.1s ease, transform 1.1s cubic-bezier(.2,.7,.2,1),
+                        background .35s ease, box-shadow .35s ease, border-color .35s ease;
+        }
+        .panel.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .panel:hover {
+            background: rgba(0, 0, 0, 0.55);
+            border-color: rgba(255, 215, 0, 0.75);
+            box-shadow: 0 0 22px rgba(255, 215, 0, 0.35);
+        }
+        .panel-title {
+            font-size: 34px;
+            letter-spacing: 8px;
+            font-weight: bold;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+        }
+        .panel-sub {
+            margin-top: 10px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            opacity: 0.85;
+        }
+        .panel-locked {
+            cursor: not-allowed;
+            opacity: 0 !important;
+        }
+        .panel.show.panel-locked {
+            opacity: 0.55 !important;
+        }
+        .back {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            font-size: 14px;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.25);
+            z-index: 30;
+            transition: all 0.3s ease;
+        }
+        .back:hover {
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+        }
+        .video-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        .video-overlay.faded-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .video-box {
+            width: min(800px, 85vw);
+            max-height: 80vh;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+        }
+        .video-box video {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+        .video-tip {
+            margin-top: 14px;
+            text-align: center;
+            color: #f5f1e6;
+            font-size: 14px;
+            letter-spacing: 3px;
+            opacity: 0.75;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+        }
+        .video-close {
+            position: absolute;
+            top: -16px;
+            right: -16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            color: #ffffff;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 41;
+            transition: all 0.25s ease;
+        }
+        .video-close:hover {
+            background: rgba(200, 0, 0, 0.85);
+            border-color: #ffffff;
+            transform: scale(1.1);
+        }
+        .video-box-wrap {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-wrap"><div class="bg-kenburns"></div></div>
+    <div class="bg-particles">
+        <div class="bg-particle" style="left:6%;  animation-delay:0.5s;  width:4px;height:4px;"></div>
+        <div class="bg-particle" style="left:20%; animation-delay:2.8s;  width:6px;height:6px;"></div>
+        <div class="bg-particle" style="left:34%; animation-delay:5.0s;  width:3px;height:3px;"></div>
+        <div class="bg-particle" style="left:48%; animation-delay:1.5s;  width:5px;height:5px;"></div>
+        <div class="bg-particle" style="left:62%; animation-delay:6.5s;  width:4px;height:4px;"></div>
+        <div class="bg-particle" style="left:76%; animation-delay:3.0s;  width:6px;height:6px;"></div>
+        <div class="bg-particle" style="left:90%; animation-delay:5.5s;  width:3px;height:3px;"></div>
+    </div>
+    <div class="video-overlay" id="video-overlay">
+        <div>
+            <div class="video-box-wrap">
+                <div class="video-box">
+                    <video id="intro-video"
+                           src="../video/4.mp4"
+                           controls
+                           preload="metadata"
+                           playsinline
+                           webkit-playsinline
+                           x5-playsinline
+                           x5-video-player-type="h5"
+                           x5-video-player-fullscreen="false"></video>
+                </div>
+                <button class="video-close" id="video-close" title="关闭视频">×</button>
+            </div>
+            <div class="video-tip">视频播放完毕将自动进入 · 饮酒其五 · 也可点击 × 随时关闭</div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back">← 返回</a>
+    <div class="panels" id="panels">
+        <div class="panel" id="panel-chudu" data-href="初读.html">
+            <div class="panel-title">初读</div>
+            <div class="panel-sub">导入 · 小序 · 作者</div>
+        </div>
+        <div class="panel" id="panel-jingdu" data-href="精读.html">
+            <div class="panel-title">精读</div>
+            <div class="panel-sub">品词 · 析句 · 会意</div>
+        </div>
+        <div class="panel" id="panel-ganwu" data-href="感悟.html">
+            <div class="panel-title">感悟</div>
+            <div class="panel-sub">沉吟 · 赏心 · 共鸣</div>
+        </div>
+    </div>
+    <div class="ft-wrapper">
+        <div class="falling-text-container" id="ft-container">
+            <div class="falling-text-target" id="ft-text"></div>
+            <div class="falling-text-canvas" id="ft-canvas"></div>
+            <div class="click-hint" id="click-hint">点击此处 · 字落如雨</div>
+        </div>
+    </div>
+    <script>
+        // 在 common.js 加载前先设置视频互斥标记，防止BGM抢先启动
+        window.__videoPlaying = true;
+    </script>
+    <script src="common.js"></script>
+
+    <script>
+        (function () {
+            const props = {
+                className: "",
+                highlightWords: ["饮", "酒", "其", "五", "陶", "渊", "明"],
+                highlightClass: "highlighted",
+                trigger: "click",
+                backgroundColor: "transparent",
+                wireframes: false,
+                gravity: 1,
+                mouseConstraintStiffness: 0.2
+            };
+            const lines = [
+                { type: "title",  text: "饮 酒 · 其 五" },
+                { type: "author", text: "陶 渊 明" },
+                { type: "verse",  text: "结 庐 在 人 境 ， 而 无 车 马 喧 。" },
+                { type: "verse",  text: "问 君 何 能 尔 ？ 心 远 地 自 偏 。" },
+                { type: "verse",  text: "采 菊 东 篱 下 ， 悠 然 见 南 山 。" },
+                { type: "verse",  text: "山 气 日 夕 佳 ， 飞 鸟 相 与 还 。" },
+                { type: "verse",  text: "此 中 有 真 意 ， 欲 辨 已 忘 言 。" }
+            ];
+            const containerRef = document.getElementById("ft-container");
+            const textRef = document.getElementById("ft-text");
+            const canvasContainerRef = document.getElementById("ft-canvas");
+            const clickHint = document.getElementById("click-hint");
+            const videoOverlay = document.getElementById("video-overlay");
+            const introVideo = document.getElementById("intro-video");
+            const panels = [
+                document.getElementById("panel-chudu"),
+                document.getElementById("panel-jingdu"),
+                document.getElementById("panel-ganwu")
+            ];
+            let videoPlaying = true;
+            const newHTML = lines
+                .map((line) => {
+                    const cls =
+                        line.type === "title" ? "ft-line ft-title" :
+                        line.type === "author" ? "ft-line ft-author" :
+                        "ft-line";
+                    const wordsHtml = line.text
+                        .split(" ")
+                        .map((word) => {
+                            const isHighlighted = props.highlightWords.some((hw) => word.startsWith(hw));
+                            return `<span class="word ${isHighlighted ? props.highlightClass : ""}">${word}</span>`;
+                        })
+                        .join(" ");
+                    return `<div class="${cls}">${wordsHtml}</div>`;
+                })
+                .join("");
+            textRef.innerHTML = newHTML;
+            textRef.style.lineHeight = "1.4";
+            function startEffect() {
+                const wordSpans = textRef.querySelectorAll(".word");
+                wordSpans.forEach((elem) => {
+                    const dur = 1800 + Math.random() * 1400;
+                    const rot = Math.round((Math.random() - 0.5) * 360);
+                    elem.style.setProperty('--fall-dur', dur + 'ms');
+                    elem.style.setProperty('--fall-rot', rot + 'deg');
+                    elem.style.setProperty('--fall-y', '75vh');
+                    elem.style.animationDelay = Math.round(Math.random() * 400) + 'ms';
+                    elem.classList.add('falling');
+                });
+            }
+            function showPanels() {
+                panels.forEach((p, idx) => {
+                    setTimeout(() => {
+                        p.classList.add("show");
+                        if (p.dataset.href) {
+                            p.addEventListener("click", () => {
+                                window.location.href = p.dataset.href;
+                            });
+                        }
+                    }, 1600 + idx * 650);
+                });
+            }
+            let effectStarted = false;
+            let urlParams = new URLSearchParams(window.location.search);
+            const isDirect = urlParams.get("direct") === "1";
+
+            function pauseBgForVideo() {
+                // 多次尝试暂停，防止 common.js 的重试机制又把它启动了
+                if (typeof window.__pauseBg === "function") {
+                    window.__pauseBg();
+                }
+                setTimeout(function () {
+                    if (typeof window.__pauseBg === "function") window.__pauseBg();
+                }, 200);
+                setTimeout(function () {
+                    if (typeof window.__pauseBg === "function") window.__pauseBg();
+                }, 600);
+                setTimeout(function () {
+                    if (typeof window.__pauseBg === "function") window.__pauseBg();
+                }, 1200);
+            }
+
+            function hideVideoAndPlay() {
+                videoOverlay.classList.add("faded-out");
+                setTimeout(() => {
+                    videoOverlay.style.display = "none";
+                }, 500);
+                videoPlaying = false;
+                window.__videoPlaying = false; // 清除视频互斥标记
+                if (typeof window.__resumeBg === "function") window.__resumeBg();
+                clickHint.classList.remove("hidden");
+            }
+            introVideo.addEventListener("ended", hideVideoAndPlay);
+            introVideo.addEventListener("play", function () {
+                window.__videoPlaying = true; // 确保互斥标记
+                pauseBgForVideo();
+            });
+            introVideo.addEventListener("playing", function () {
+                window.__videoPlaying = true;
+                pauseBgForVideo();
+            });
+            introVideo.addEventListener("pause", function () {
+                // 只有当视频overlay已隐藏（即用户主动关闭）时才恢复BGM
+                // 否则保持暂停，避免用户手动点暂停后BGM突然响起
+                if (!videoPlaying || videoOverlay.style.display === "none") {
+                    window.__videoPlaying = false;
+                    if (typeof window.__resumeBg === "function") window.__resumeBg();
+                }
+            });
+            // 关闭按钮：随时关闭视频并进入文字掉落
+            document.getElementById("video-close").addEventListener("click", function () {
+                introVideo.pause();
+                hideVideoAndPlay();
+            });
+
+            function handleTrigger() {
+                if (videoPlaying) return;
+                if (!effectStarted) {
+                    effectStarted = true;
+                    clickHint.classList.add("hidden");
+                    try { startEffect(); } catch (err) { if (typeof console !== 'undefined') console.warn('字落效果启动失败（可能是物理引擎未能加载）:', err); }
+                    if (typeof window.__playWood === "function") window.__playWood();
+                    showPanels();
+                }
+            }
+            containerRef.addEventListener("click", handleTrigger);
+
+            if (isDirect) {
+                videoOverlay.style.display = "none";
+                videoPlaying = false;
+                window.__videoPlaying = false; // direct模式无视频，允许BGM
+                clickHint.classList.add("hidden");
+                showPanels();
+            } else {
+                window.__videoPlaying = true;
+                pauseBgForVideo();
+                introVideo.play().catch(function () {
+                    // 自动播放失败（可能需要用户点击），但仍保持互斥标记
+                    // 当用户点击视频启动播放时，play事件会再次暂停BGM
+                });
+            }
+            document.addEventListener("dragstart", (e) => e.preventDefault());
+        })();
+    </script>
+</body>
+</html>

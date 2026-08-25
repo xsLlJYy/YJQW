@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>感悟 · 饮酒其五</title>
+    <style>
+        * {margin: 0;
+            padding: 0;
+            box-sizing: border-box;}
+        html, body {width: 100%;
+            min-height: 100vh;}
+        body {font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+            color: #f5f1e6;
+            overflow-x: hidden;}
+        /* ===== 动态背景（Ken Burns + 粒子浮动）===== */
+        .bg-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .bg-kenburns {
+            position: absolute;
+            inset: 0;
+            background: url("../images/5.jpg") no-repeat center center;
+            background-size: cover;
+            animation: kbZoom 35s ease-in-out infinite alternate;
+            transform-origin: center;
+            filter: saturate(1.05) brightness(0.92);
+        }
+        @keyframes kbZoom {
+            0%   { transform: scale(1.0) translate(0, 0); }
+            100% { transform: scale(1.13) translate(10px, 6px); }
+        }
+        .bg-particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #ffe8a8;
+            border-radius: 50%;
+            opacity: 0.55;
+            box-shadow: 0 0 5px #ffe8a8;
+            animation: bgFloat 15s linear infinite;
+        }
+        @keyframes bgFloat {
+            0%   { transform: translateY(110vh) translateX(0); opacity: 0; }
+            10%  { opacity: 0.55; }
+            90%  { opacity: 0.55; }
+            100% { transform: translateY(-10vh) translateX(-15px); opacity: 0; }
+        }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(20, 18, 14, 0.55) 0%,
+                rgba(20, 18, 14, 0.45) 50%,
+                rgba(20, 18, 14, 0.55) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .back {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            font-size: 19px;
+            color: #f5f1e6;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid rgba(245, 241, 230, 0.5);
+            border-radius: 20px;
+            background: rgba(20, 18, 14, 0.45);
+            z-index: 50;
+            backdrop-filter: blur(2px);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }.back:hover {
+            background: rgba(20, 18, 14, 0.7);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+        }.hero {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 28vh;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 22px;
+        }.hero-label {
+            font-size: 20px;
+            letter-spacing: 8px;
+            color: #d4af6f;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }.hero-title {
+            font-size: 59px;
+            letter-spacing: 14px;
+            color: #f5f1e6;
+            font-weight: bold;
+            padding-bottom: 18px;
+            position: relative;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+        }.hero-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent, rgba(212, 175, 111, 0.7), transparent);
+        }.hero-sub {
+            margin-top: 14px;
+            font-size: 22px;
+            letter-spacing: 6px;
+            color: #d4af6f;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }.content {
+            position: relative;
+            z-index: 1;
+            max-width: 920px;
+            margin: 0 auto 80px;
+            padding: 0 28px;
+        }.section {
+            margin-bottom: 48px;
+            background: rgba(20, 18, 14, 0.58);
+            border: 1px solid rgba(212, 175, 111, 0.35);
+            border-radius: 14px;
+            padding: 36px 40px 40px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            position: relative;
+            color: #f5f1e6;
+        }.section::before {
+            content: attr(data-seal);
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            font-weight: bold;
+            color: #fff8e1;
+            background: #8b2c2c;
+            border-radius: 6px;
+            transform: rotate(-4deg);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }.sec-head {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(212, 175, 111, 0.4);
+        }.sec-num {
+            font-size: 47px;
+            font-weight: bold;
+            color: #d4af6f;
+            margin-right: 16px;
+            line-height: 1;
+            font-family: 'Georgia', serif;
+        }.sec-title {
+            font-size: 35px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #f5f1e6;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }.sec-en {
+            margin-left: 14px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: #d4af6f;
+            font-family: 'Georgia', serif;
+            opacity: 0.85;
+        }.sec-body {
+            font-size: 23px;
+            line-height: 2.05;
+            color: #f5f1e6;
+            letter-spacing: 0.5px;
+            text-align: justify;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }.sec-body p { margin-bottom: 16px; }
+        .sec-body p:last-child { margin-bottom: 0; }
+
+        .kw { color: #ffd76a; font-weight: bold; }
+
+        .three-lines {
+            margin: 22px 0 22px;
+            padding: 18px 22px 18px 22px;
+            background: rgba(212, 175, 111, 0.1);
+            border-left: 4px solid #d4af6f;
+            border-radius: 4px 8px 8px 4px;
+        }.three-lines-title {
+            font-size: 21px;
+            letter-spacing: 4px;
+            color: #d4af6f;
+            margin-bottom: 14px;
+            font-weight: bold;
+        }.three-lines ul {
+            list-style: none;
+            padding-left: 0;
+        }.three-lines li {
+            position: relative;
+            padding: 8px 0 8px 32px;
+            font-size: 23px;
+            line-height: 1.9;
+            color: #f5f1e6;
+            border-bottom: 1px dashed rgba(212, 175, 111, 0.25);
+        }.three-lines li:last-child { border-bottom: none; }
+        .three-lines li::before {
+            content: "—";
+            position: absolute;
+            left: 6px;
+            top: 8px;
+            color: #d4af6f;
+            font-weight: bold;
+        }.eval-q {
+            margin-top: 18px;
+            margin-bottom: 18px;
+        }.eval-q-label {
+            display: block;
+            font-size: 23px;
+            line-height: 1.85;
+            color: #f5f1e6;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }.eval-q-label .qno {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            color: #fff8e1;
+            background: #8b2c2c;
+            border-radius: 50%;
+            font-size: 19px;
+            font-weight: bold;
+            margin-right: 8px;
+        }.eval-q textarea {
+            width: 100%;
+            min-height: 110px;
+            padding: 12px 16px;
+            font-size: 21px;
+            font-family: inherit;
+            line-height: 1.85;
+            border: 1px solid rgba(212, 175, 111, 0.4);
+            border-radius: 8px;
+            background: rgba(255, 250, 230, 0.92);
+            color: #2c2a25;
+            outline: none;
+            resize: vertical;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }.eval-q textarea:focus {
+            border-color: #d4af6f;
+            box-shadow: 0 0 0 3px rgba(212, 175, 111, 0.18);
+        }.eval-submit {
+            display: block;
+            margin: 24px auto 8px;
+            padding: 12px 48px;
+            font-size: 21px;
+            font-family: inherit;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #8b2c2c, #6b1f1f);
+            color: #fff8e1;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(139, 44, 44, 0.4);
+            transition: all 0.3s ease;
+        }.eval-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 44, 44, 0.55);
+        }.eval-submit:active {
+            transform: translateY(0);
+        }.toast-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(6px);
+            animation: fadeIn 0.4s ease;
+        }.toast-mask.show { display: flex; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }.toast {
+            width: min(520px, 88vw);
+            padding: 44px 40px 36px;
+            background: linear-gradient(180deg,
+                rgba(40, 30, 20, 0.96),
+                rgba(20, 16, 12, 0.96));
+            border: 1.5px solid rgba(212, 175, 111, 0.6);
+            border-radius: 16px;
+            box-shadow: 0 10px 50px rgba(255, 215, 0, 0.18),
+                        0 4px 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: #f5f1e6;
+            position: relative;
+            transform: scale(0.85);
+            opacity: 0;
+            animation: popIn 0.5s cubic-bezier(.2,.8,.2,1) forwards;
+        }@keyframes popIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }.toast-icon {
+            font-size: 57px;
+            color: #ffd76a;
+            margin-bottom: 16px;
+            text-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+            animation: glow 1.8s ease-in-out infinite;
+        }@keyframes glow {
+            0%, 100% { text-shadow: 0 0 12px rgba(255, 215, 0, 0.4); }
+            50%      { text-shadow: 0 0 28px rgba(255, 215, 0, 0.85); }
+        }.toast-title {
+            font-size: 31px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            color: #ffd76a;
+            margin-bottom: 18px;
+        }.toast-msg {
+            font-size: 22px;
+            line-height: 1.9;
+            color: #f5f1e6;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }.toast-progress {
+            font-size: 25px;
+            font-weight: bold;
+            color: #ffd76a;
+            letter-spacing: 2px;
+            margin-top: 12px;
+            margin-bottom: 22px;
+        }.toast-progress .num {
+            font-size: 37px;
+            margin: 0 4px;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+        }.toast-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 16px;
+        }.toast-btn {
+            padding: 10px 28px;
+            font-size: 19px;
+            font-family: inherit;
+            letter-spacing: 4px;
+            background: transparent;
+            color: #f5f1e6;
+            border: 1px solid rgba(212, 175, 111, 0.55);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }.toast-btn:hover {
+            background: rgba(212, 175, 111, 0.18);
+            box-shadow: 0 0 12px rgba(212, 175, 111, 0.4);
+        }.toast-btn.primary {
+            background: linear-gradient(135deg, #8b2c2c, #6b1f1f);
+            border-color: #8b2c2c;
+            color: #fff8e1;
+        }.toast-btn.primary:hover {
+            box-shadow: 0 0 14px rgba(139, 44, 44, 0.6);
+        } .foot {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 30px 0 50px;
+            font-size: 18px;
+            letter-spacing: 4px;
+            color: #d4af6f;
+            opacity: 0.85;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-wrap"><div class="bg-kenburns"></div></div>
+    <div class="bg-particles">
+        <div class="bg-particle" style="left:7%;  animation-delay:0.7s;   width:4px;height:4px;"></div>
+        <div class="bg-particle" style="left:23%; animation-delay:2.5s;   width:6px;height:6px;"></div>
+        <div class="bg-particle" style="left:37%; animation-delay:4.2s;   width:3px;height:3px;"></div>
+        <div class="bg-particle" style="left:50%; animation-delay:1.0s;   width:5px;height:5px;"></div>
+        <div class="bg-particle" style="left:64%; animation-delay:6.0s;   width:4px;height:4px;"></div>
+        <div class="bg-particle" style="left:79%; animation-delay:3.2s;   width:6px;height:6px;"></div>
+        <div class="bg-particle" style="left:93%; animation-delay:4.8s;   width:3px;height:3px;"></div>
+    </div>
+    <div class="overlay"></div>
+    <a href="饮酒其五.html?direct=1" class="back">← 返回</a>
+
+    <div class="hero">
+        <div class="hero-label">感 悟 篇</div>
+        <div class="hero-title">饮酒·其五</div>
+        <div class="hero-sub">陶 渊 明</div>
+    </div>
+    <div class="content">
+        <section class="section" data-seal="柒">
+            <div class="sec-head">
+                <span class="sec-num">01</span>
+                <span class="sec-title">课堂小结</span>
+                <span class="sec-en">SUMMARY</span>
+            </div>
+            <div class="sec-body">
+                <p>
+                    通过全篇学习就会发现，陶渊明借<span class="kw">"饮酒"</span>的名义，
+                    其实在说<span class="kw">三句话</span>——
+                </p>
+
+                <div class="three-lines">
+                    <div class="three-lines-title">※ 三 句 真 心 话</div>
+                    <ul>
+                        <li>他厌倦了官场的虚伪，所以<span class="kw">"无车马喧"</span>；</li>
+                        <li>他沉醉于田园的自在，所以<span class="kw">"见南山""飞鸟还"</span>时那么悠然随性；</li>
+                        <li>他终于找到了心灵的家，所以有<span class="kw">"欲辨已忘言"</span>的满足。</li>
+                    </ul>
+                </div>
+
+                <p>
+                    说到底，这是一首藏着<span class="kw">"爱田园、厌世俗、求自由"</span>的诗，
+                    每一句都是他卸下伪装后的真心话。
+                </p>
+                <p>
+                    <span class="kw">"饮酒"</span>这个题目，就是陶渊明的<span class="kw">"引子"</span>——
+                    他借着"酒后坦诚"的感觉，把对田园的爱、对自由的追求，
+                    都藏在了<span class="kw">菊花、南山、飞鸟</span>这些景物里。
+                </p>
+                <p>
+                    诗里没酒，却比写酒更动人：因为他写的是<span class="kw">"醉心于本真"</span>的状态，
+                    这才是<span class="kw">"饮酒"</span>背后的真意。
+                </p>
+
+                <div style="margin-top: 22px; padding: 18px 22px;
+                            background: rgba(212, 175, 111, 0.08);
+                            border-left: 4px solid #d4af6f;
+                            border-radius: 4px 8px 8px 4px;">
+                    <p>
+                        人们常常被<span class="kw">物质欲望</span>和<span class="kw">快节奏的生活</span>所困扰，
+                        陶渊明的诗作和生活态度为我们提供了一种反思和借鉴。
+                        通过陶渊明的诗文，我们不仅能够领略到古代田园诗的魅力，
+                        更能从中汲取到一种<span class="kw">生活的智慧和力量</span>。
+                    </p>
+                </div>
+
+            </div>
+        </section>
+        <section class="section" data-seal="捌">
+            <div class="sec-head">
+                <span class="sec-num">02</span>
+                <span class="sec-title">评价</span>
+                <span class="sec-en">REFLECTION</span>
+            </div>
+            <div class="sec-body">
+
+                <p style="margin-bottom: 22px;">
+                    学完了这首诗，是时候停下来想一想——
+                </p>
+
+                <div class="eval-q">
+                    <label class="eval-q-label">
+                        <span class="qno">1</span>你觉得陶渊明是一个怎样的人呢？
+                    </label>
+                    <textarea id="eval-1" placeholder="写下你心中的陶渊明……"></textarea>
+                </div>
+
+                <div class="eval-q">
+                    <label class="eval-q-label">
+                        <span class="qno">2</span>这首诗让你感受到了什么？
+                    </label>
+                    <textarea id="eval-2" placeholder="写下你读完诗后的真实感受……"></textarea>
+                </div>
+
+                <button class="eval-submit" id="eval-submit">提 交</button>
+
+            </div>
+        </section>
+
+    </div>
+
+    <div class="foot">— 感悟既成，诗心可鉴 —</div>
+    <div class="toast-mask" id="toast-mask">
+        <div class="toast">
+            <div class="toast-icon">✦</div>
+            <div class="toast-title">恭喜你完成本次学习！</div>
+            <div class="toast-msg">你已走过初读、精读、感悟三重境界，<br>与陶渊明共饮一杯"真意"之酒。</div>
+            <div class="toast-progress">当前穿越知识储备量<span class="num">10</span>%</div>
+            <div class="toast-btns">
+                <button class="toast-btn" id="toast-close">继续感悟</button>
+                <button class="toast-btn primary" id="toast-home">回到首页</button>
+            </div>
+        </div>
+    </div>
+    <script src="common.js"></script>
+    <script>
+        (function () {
+            var submitBtn = document.getElementById('eval-submit');
+            var mask = document.getElementById('toast-mask');
+            var closeBtn = document.getElementById('toast-close');
+            var homeBtn = document.getElementById('toast-home');
+
+            submitBtn.addEventListener('click', function () {
+                mask.classList.add('show');
+            });
+            closeBtn.addEventListener('click', function () {
+                mask.classList.remove('show');
+            });
+            homeBtn.addEventListener('click', function () {
+                window.location.href = 'index.html';
+            });
+            mask.addEventListener('click', function (e) {
+                if (e.target === mask) mask.classList.remove('show');
+            });
+        })();
+    </script>
+</body>
+</html>

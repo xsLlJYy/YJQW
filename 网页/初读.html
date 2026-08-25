@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初读 · 饮酒其五</title>
+    <style>
+        * { margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+        }
+        body {
+            font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+            color: #2c2a25;
+            overflow-x: hidden;
+        }
+        /* ===== 动态背景（Ken Burns + 粒子浮动）===== */
+        .bg-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+        }
+        .bg-kenburns {
+            position: absolute;
+            inset: 0;
+            background: url("../images/3.jpg") no-repeat center center;
+            background-size: cover;
+            animation: kbZoom 30s ease-in-out infinite alternate;
+            transform-origin: center;
+            filter: saturate(1.05);
+        }
+        @keyframes kbZoom {
+            0%   { transform: scale(1.0) translate(0, 0); }
+            100% { transform: scale(1.12) translate(-8px, -5px); }
+        }
+        .bg-particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #f5d98a;
+            border-radius: 50%;
+            opacity: 0.55;
+            box-shadow: 0 0 4px #f5d98a;
+            animation: bgFloat 12s linear infinite;
+        }
+        @keyframes bgFloat {
+            0%   { transform: translateY(110vh) translateX(0); opacity: 0; }
+            10%  { opacity: 0.55; }
+            90%  { opacity: 0.55; }
+            100% { transform: translateY(-10vh) translateX(25px); opacity: 0; }
+        }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(255, 248, 225, 0.78) 0%,
+                rgba(255, 248, 225, 0.68) 50%,
+                rgba(255, 248, 225, 0.78) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }.back {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            font-size: 19px;
+            color: #2c2a25;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid rgba(44, 42, 37, 0.5);
+            border-radius: 20px;
+            background: rgba(255, 248, 225, 0.55);
+            z-index: 50;
+            backdrop-filter: blur(2px);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }.back:hover {
+            background: rgba(255, 248, 225, 0.85);
+            box-shadow: 0 0 12px rgba(120, 90, 30, 0.3);
+        }.hero {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 30vh;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 28px;
+        }.hero-label {
+            font-size: 20px;
+            letter-spacing: 8px;
+            color: #6b532c;
+            margin-bottom: 14px;
+            opacity: 0.85;
+        }.hero-title {
+            font-size: 63px;
+            letter-spacing: 14px;
+            color: #2c2a25;
+            font-weight: bold;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+            position: relative;
+            padding-bottom: 22px;
+        }.hero-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent, rgba(107, 83, 44, 0.6), transparent);
+        }.hero-sub {
+            margin-top: 16px;
+            font-size: 23px;
+            letter-spacing: 6px;
+            color: #6b532c;
+        }.content {
+            position: relative;
+            z-index: 1;
+            max-width: 920px;
+            margin: 0 auto 80px;
+            padding: 0 28px;
+        }.section {
+            margin-bottom: 52px;
+            background: rgba(255, 250, 235, 0.78);
+            border: 1px solid rgba(107, 83, 44, 0.25);
+            border-radius: 14px;
+            padding: 38px 42px 40px;
+            box-shadow: 0 6px 24px rgba(44, 42, 37, 0.08);
+            backdrop-filter: blur(3px);
+            position: relative;
+        }.section::before {
+            content: attr(data-seal);
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            font-weight: bold;
+            color: #fff8e1;
+            background: #8b2c2c;
+            border-radius: 6px;
+            transform: rotate(-4deg);
+            letter-spacing: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }.sec-head {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 24px;
+            padding-bottom: 14px;
+            border-bottom: 1px dashed rgba(107, 83, 44, 0.4);
+        }.sec-num {
+            font-size: 47px;
+            font-weight: bold;
+            color: #8b2c2c;
+            margin-right: 16px;
+            line-height: 1;
+            font-family: 'Georgia', 'STKaiti', serif;
+        }.sec-title {
+            font-size: 37px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #2c2a25;
+        }.sec-en {
+            margin-left: 16px;
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: #8a7451;
+            font-family: 'Georgia', serif;
+        }.sec-body {
+            font-size: 23px;
+            line-height: 2;
+            color: #2c2a25;
+            letter-spacing: 0.5px;
+            text-align: justify;
+        }.sec-body p {
+            margin-bottom: 16px;
+        }.sec-body p:last-child { margin-bottom: 0; }
+        .sub-block {
+            margin-top: 22px;
+            padding: 18px 22px;
+            background: rgba(107, 83, 44, 0.08);
+            border-left: 4px solid #8b2c2c;
+            border-radius: 4px 8px 8px 4px;
+        }.sub-label {
+            display: inline-block;
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: #fff8e1;
+            background: #6b532c;
+            padding: 4px 14px 5px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }.quote {
+            font-size: 24px;
+            line-height: 2.1;
+            color: #5a4220;
+            padding: 18px 24px;
+            background: rgba(255, 250, 230, 0.92);
+            border: 1px dashed #8a7451;
+            border-radius: 8px;
+            margin: 12px 0 4px;
+            text-indent: 0;
+            letter-spacing: 1px;
+            position: relative;
+        }.quote::before,
+        .quote::after {
+            content: '「';
+            position: absolute;
+            font-size: 37px;
+            color: #8b2c2c;
+            line-height: 1;
+            opacity: 0.6;
+        }.quote::before { content: '「'; top: -6px; left: 6px; }
+        .quote::after  { content: '」'; bottom: -22px; right: 8px; }
+        .kw {
+            color: #8b2c2c;
+            font-weight: bold;
+            padding: 0 2px;
+        }.qs {
+            color: #2c2a25;
+            font-weight: bold;
+            font-size: 24px;
+        }.timeline {
+            position: relative;
+            padding-left: 24px;
+            margin-top: 18px;
+        }.timeline::before {
+            content: "";
+            position: absolute;
+            left: 6px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(180deg, #8b2c2c, #6b532c, #8b2c2c);
+        }.t-item {
+            position: relative;
+            margin-bottom: 22px;
+            padding: 14px 20px;
+            background: rgba(255, 250, 230, 0.82);
+            border-radius: 8px;
+            border: 1px solid rgba(107, 83, 44, 0.2);
+        }.t-item:last-child { margin-bottom: 0; }
+        .t-item::before {
+            content: "";
+            position: absolute;
+            left: -22px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            background: #8b2c2c;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(139, 44, 44, 0.18);
+        }.t-period {
+            font-size: 20px;
+            color: #6b532c;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }.t-title {
+            font-size: 25px;
+            font-weight: bold;
+            color: #2c2a25;
+            margin-bottom: 6px;
+        }.t-desc {
+            font-size: 21px;
+            line-height: 1.9;
+            color: #3e3a33;
+        }.story {
+            margin-top: 22px;
+            padding: 24px 28px;
+            background: radial-gradient(ellipse at top left,
+                rgba(255, 220, 160, 0.35),
+                rgba(107, 83, 44, 0.1));
+            border: 1px solid rgba(107, 83, 44, 0.3);
+            border-radius: 14px;
+            position: relative;
+        }.story::before {
+            content: "典故";
+            position: absolute;
+            top: -12px;
+            left: 22px;
+            background: #8b2c2c;
+            color: #fff8e1;
+            font-size: 18px;
+            letter-spacing: 4px;
+            padding: 2px 12px 3px;
+            border-radius: 4px;
+        }.story-title {
+            font-size: 29px;
+            font-weight: bold;
+            color: #8b2c2c;
+            margin: 4px 0 14px;
+            letter-spacing: 3px;
+        }.story p {
+            font-size: 22px;
+            line-height: 2;
+            color: #2c2a25;
+            margin-bottom: 12px;
+        }.story p:last-child { margin-bottom: 0; }
+        .bio-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 24px;
+            margin: 14px 0 18px;
+            padding: 16px 22px;
+            background: rgba(255, 250, 230, 0.88);
+            border-radius: 10px;
+            border: 1px solid rgba(107, 83, 44, 0.22);
+            font-size: 21.5px;
+            line-height: 2;
+        }.bio-card .row {
+            color: #2c2a25;
+        }.bio-card .row b {
+            color: #6b532c;
+            letter-spacing: 1px;
+            margin-right: 6px;
+        }.bio-card .row.full { grid-column: span 2; }
+        .think-box {
+            margin-top: 18px;
+            padding: 18px 22px;
+            background: rgba(139, 44, 44, 0.08);
+            border: 1px dashed rgba(139, 44, 44, 0.35);
+            border-radius: 8px;
+            font-size: 22px;
+            line-height: 2;
+            color: #2c2a25;
+        }.think-box::before {
+            content: "✦ 思考引题";
+            display: inline-block;
+            margin-right: 10px;
+            color: #8b2c2c;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }.foot {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 30px 0 50px;
+            font-size: 18px;
+            letter-spacing: 4px;
+            color: #6b532c;
+            opacity: 0.8;
+    </style>
+</head>
+<body>
+    <div class="bg-wrap"><div class="bg-kenburns"></div></div>
+    <div class="bg-particles">
+        <div class="bg-particle" style="left:8%;  animation-delay:0s;   width:4px;height:4px;"></div>
+        <div class="bg-particle" style="left:22%; animation-delay:2s;   width:6px;height:6px;"></div>
+        <div class="bg-particle" style="left:38%; animation-delay:4.5s; width:3px;height:3px;"></div>
+        <div class="bg-particle" style="left:52%; animation-delay:1.2s; width:5px;height:5px;"></div>
+        <div class="bg-particle" style="left:66%; animation-delay:6s;   width:4px;height:4px;"></div>
+        <div class="bg-particle" style="left:78%; animation-delay:3.3s; width:6px;height:6px;"></div>
+        <div class="bg-particle" style="left:92%; animation-delay:5.1s; width:3px;height:3px;"></div>
+    </div>
+    <div class="overlay"></div>
+
+    <a href="饮酒其五.html?direct=1" class="back">← 返回</a>
+
+    <div class="hero">
+        <div class="hero-label">初 读 篇</div>
+        <div class="hero-title">饮酒·其五</div>
+        <div class="hero-sub">陶 渊 明</div>
+    </div>
+
+    <div class="content">
+        <section class="section" data-seal="壹">
+            <div class="sec-head">
+                <span class="sec-num">01</span>
+                <span class="sec-title">导入</span>
+                <span class="sec-en">INTRODUCTION</span>
+            </div>
+            <div class="sec-body">
+                <p>
+                    <span class="qs">《饮酒（其五）》题目里明明有"饮酒"两个字，可整首诗读下来，连"酒"字的影子都没见着。</span>
+                </p>
+                <p>
+                    整首诗歌写的是"结庐在人境"的隐居日常，是"采菊东篱下"的悠然风景，是"山气日夕佳"的日暮山色，是"飞鸟相与还"的倦鸟归林，是"此中有真意"的心灵感悟——
+                    <span class="kw">通篇无"酒"，却以"饮酒"为题。</span>
+                </p>
+                <div class="think-box">
+                    那么，<span class="kw">为什么叫"饮酒"却不写酒呢？</span>
+                    今天，咱们就从<span class="kw">"饮酒"</span>这个特别的题目入手，
+                    找找诗里藏着的<span class="kw">"真意"</span>。
+                </div>
+            </div>
+        </section>
+        <section class="section" data-seal="贰">
+            <div class="sec-head">
+                <span class="sec-num">02</span>
+                <span class="sec-title">小序</span>
+                <span class="sec-en">PREFACE</span>
+            </div>
+            <div class="sec-body">
+                <p>
+                    <span class="kw">《饮酒》组诗共 20 首</span>，是陶渊明归隐后陆续写成的一组五言古诗。
+                    组诗前有一篇小序，交代了他写作时的心境——
+                </p>
+                <div class="quote">
+                    余闲居寡欢，兼比夜已长，偶有名酒，无夕不饮，顾影独尽。忽焉复醉。既醉之后，辄题数句自娱，纸墨遂多，辞无诠次，聊命故人书之，以为欢笑尔。
+                </div>
+                <div style="height: 28px;"></div>
+
+                <div class="sub-block">
+                    <span class="sub-label">序文解读</span>
+                    <p>
+                        <span class="kw">"闲居寡欢"</span>、<span class="kw">"顾影独尽"</span>——
+                        可见诗人是在<span class="kw">孤寂、痛苦</span>的心境下写下这组诗的。
+                    </p>
+                    <p>
+                        <span class="kw">"纸墨遂多，辞无诠次"</span>——
+                        可见这组诗<span class="kw">并非一时所作</span>，而是由少到多、逐渐积累的过程，
+                        是诗人借<span class="kw">"既醉之后"</span>这个特别的时机，
+                        把他平时积聚的所想所感，陆续地、不加掩饰地抒发出来的。
+                    </p>
+                    <p>
+                        正因如此，"饮酒"二字<span class="kw">不是诗的主题，而是诗的契机</span>——
+                        是诗人借酒抒怀的那个"引子"，是微醺之后才肯说真话的那扇门。
+                        诗里可以没有酒，因为酒早已融在了字里行间的"真意"之中。
+                    </p>
+                </div>
+            </div>
+        </section>
+        <section class="section" data-seal="叁">
+            <div class="sec-head">
+                <span class="sec-num">03</span>
+                <span class="sec-title">作者介绍</span>
+                <span class="sec-en">ABOUT THE POET</span>
+            </div>
+            <div class="sec-body">
+
+                <p style="font-size: 25px; font-weight: bold; color: #2c2a25; margin-bottom: 6px;">
+                    陶渊明 <span style="color: #6b532c; font-size: 21px; font-weight: normal;">（约 365 — 427）</span>
+                </p>
+
+                <div class="bio-card">
+                    <div class="row"><b>名：</b>潜</div>
+                    <div class="row"><b>字：</b>元亮</div>
+                    <div class="row"><b>别号：</b>五柳先生</div>
+                    <div class="row"><b>世称：</b>靖节先生</div>
+                    <div class="row"><b>时代：</b>东晋末期</div>
+                    <div class="row"><b>身份：</b>诗人</div>
+                    <div class="row full"><b>著述：</b>《陶渊明集》</div>
+                    <div class="row full"><b>文学史地位：</b>
+                        <span class="kw">中国第一位田园诗人</span> ·
+                        "古今隐逸诗人之宗" ·
+                        <span class="kw">田园诗派鼻祖</span>
+                    </div>
+                    <div class="row full"><b>人生关键词：</b>
+                        多次出仕 → 最终归隐田园 · 不为五斗米折腰
+                    </div>
+                </div>
+                <p style="font-size: 25px; font-weight: bold; color: #2c2a25; margin-top: 10px;">人生三阶段</p>
+                <div class="timeline">
+                    <div class="t-item">
+                        <div class="t-period">第一时期 · 28 岁以前</div>
+                        <div class="t-title">年少居家，饱读诗书</div>
+                        <div class="t-desc">
+                            出身没落仕宦世家，自幼熟读经典，接受儒家教育，
+                            <span class="kw">有过出仕报国的理想</span>。
+                        </div>
+                    </div>
+                    <div class="t-item">
+                        <div class="t-period">第二时期 · 29 岁 至 41 岁</div>
+                        <div class="t-title">时仕时隐，彷徨挣扎</div>
+                        <div class="t-desc">
+                            几度出仕为官（曾任江州祭酒、镇军参军、建威参军等职），
+                            目睹官场腐败黑暗，内心<span class="kw">处在仕与隐的矛盾与痛苦之中</span>，
+                            每次做官时间都不长，旋即辞官归家。
+                        </div>
+                    </div>
+                    <div class="t-item">
+                        <div class="t-period">第三时期 · 42 岁 至 62 岁</div>
+                        <div class="t-title">辞官归隐，归居田园</div>
+                        <div class="t-desc">
+                            41 岁任彭泽县令，上任 <span class="kw">仅 81 天便辞官归隐</span>，
+                            此后<strong>终生未再出仕</strong>。直至病故之前，
+                            躬耕田园、饮酒著诗，成就了中国文学史上最纯粹的田园之音。
+                        </div>
+                    </div>
+                </div>
+                <div class="story">
+                    <div class="story-title">不为五斗米折腰</div>
+                    <p>
+                        陶渊明祖上虽然做过官，但是家境早已败落。
+                        他<span class="kw">最后一次出仕为官</span>，是在 41 岁那年担任
+                        <span class="kw">彭泽县令</span>。
+                    </p>
+                    <p>
+                        上任不久，上级倚仗权势、趾高气昂，派人传命要陶渊明去拜见督邮。
+                        属吏提醒他："应当整冠束带、恭恭敬敬地去迎接。"
+                    </p>
+                    <p>
+                        陶渊明不愿卑躬屈膝，高声说道：
+                        <span class="kw">『我宁可饿死，也不愿为了这五斗米的官俸，去向那种势利小人鞠躬作揖。』</span>
+                    </p>
+                    <p>
+                        就这样，他上任<span class="kw">仅仅 81 天</span>，
+                        便<span class="kw">辞官归隐</span>，此后再未做官，
+                        真正走出了他一生的"樊笼"。
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <div class="foot">— 初读既毕，可返精读 —</div>
+    <script src="common.js"></script>
+</body>
+</html>

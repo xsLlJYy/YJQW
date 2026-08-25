@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古典诗词意境动画</title>
+    <style>
+        * {margin: 0;
+            padding: 0;
+            box-sizing: border-box;}
+        body {min-height: 100vh;
+            background: url("../images/1111.jpg") no-repeat center center fixed;
+            background-size: cover;
+            overflow: hidden;
+            cursor: pointer;}
+        .hint {position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'STKaiti', 'KaiTi', serif;
+            font-size: 16px;
+            color: #f8fafc;
+            letter-spacing: 4px;
+            opacity: 0.75;
+            animation: hintPulse 2.4s ease-in-out infinite;
+            pointer-events: none;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);}
+        @keyframes hintPulse {0%, 100% { opacity: 0.45; }
+            50%      { opacity: 0.9; }}
+        .container {width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 22vh;
+            position: relative;}
+        .sft {display: flex;
+            gap: 6px;
+            perspective: 1200px;
+            animation: sftIn 1s ease-out both;}
+        .sft-tile { width: 130px;
+            height: 160px;
+            background: rgba(32, 32, 32, 0.82);
+            color: #f8fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
+            font-family: 'STKaiti', 'KaiTi', serif;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07),
+                        inset 0 -2px 8px rgba(0, 0, 0, 0.35);
+            position: relative;}
+        .sft-tile::before { content: '';
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            top: 50%;
+            height: 2px;
+            background: rgba(0, 0, 0, 0.55);
+            transform: translateY(-50%);
+            pointer-events: none;}
+        @keyframes sftIn {from { opacity: 0; transform: scale(0.92); }
+            to   { opacity: 1; transform: scale(1); }}
+        .particles {position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;}
+        .particle {position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffd700;
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;}
+        @keyframes float {0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(680deg); opacity: 0; }}
+    </style>
+</head>
+<body>
+    <div class="particles">
+        <div class="particle" style="left: 12%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 27%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 35%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 52%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 63%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 88%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 98%; animation-delay: 2.5s;"></div>
+    </div>
+
+    <div class="container">
+        <div class="sft" id="splitflap"></div>
+    </div>
+
+    <div class="hint">单击进入 · 饮酒·其五</div>
+
+    
+    <script src="common.js"></script>
+    <script>
+        
+        var navigating = false;
+        document.addEventListener('click', function () {if (navigating) return;
+            navigating = true;
+            setTimeout(function () {window.location.href = '饮酒其五.html';}, 150);});
+    </script>
+
+    <script>
+        (function () {const config = {words: ["饮酒·其五", "陶渊明"], 
+                flipDuration: 0.2,               
+                stagger: 0.06,                   
+                cycleDelay: 2400,               
+                flipsPerChar: 8,                
+                padTo: 5,                        
+                loop: true};
+            const charset = "结庐在人境而无车马喧问君何能尔心远地自偏采菊东篱下悠然见南山气日夕佳飞鸟相与还此中有真意欲辨已忘言诗酒其五陶渊明·";
+            const container = document.getElementById('splitflap');
+            const tiles = [];
+            let wordIndex = 0;
+            for (let i = 0; i < config.padTo; i++) {const tile = document.createElement('div');
+                tile.className = 'sft-tile';
+                container.appendChild(tile);
+                tiles.push(tile);}
+
+            function randChar() {return charset[Math.floor(Math.random() * charset.length)];}
+
+            
+            function padWord(word) {const chars = [...word];
+                if (chars.length >= config.padTo) {
+                    return chars.slice(0, config.padTo).join('');}
+                const total = config.padTo - chars.length;
+                const left = Math.floor(total / 2);
+                const right = total - left;
+                return ' '.repeat(left) + word + ' '.repeat(right);}
+
+            function setChar(tile, ch) {tile.textContent = (ch === ' ') ? '' : ch;}
+
+            
+            function flipTile(tile, newChar) {const dur = config.flipDuration * 1000;
+                tile.animate([
+                    { transform: 'rotateX(0deg)' },
+                    { transform: 'rotateX(90deg)', offset: 0.5 },
+                    { transform: 'rotateX(0deg)' }
+                ], {duration: dur,
+                    easing: 'ease-in-out',
+                    fill: 'none'
+                });
+               
+                setTimeout(() => setChar(tile, newChar), dur / 2);}
+
+            function cycle() {const word = padWord(config.words[wordIndex]);
+                wordIndex = (wordIndex + 1) % config.words.length;
+
+                
+                if (typeof window.__playFlip === "function") window.__playFlip();
+
+                const chars = [...word];
+                for (let i = 0; i < config.padTo; i++) {
+                    const target = chars[i] || ' ';
+                    for (let f = 0; f < config.flipsPerChar; f++) {
+                        const delay = (i * config.stagger + f * config.flipDuration) * 1000;
+                        const isLast = (f === config.flipsPerChar - 1);
+                        const ch = isLast ? target : randChar();
+                        ((tile, c) => setTimeout(() => flipTile(tile, c), delay))(tiles[i], ch);}}
+
+                const totalTime = ((config.padTo - 1) * config.stagger +
+                                   config.flipsPerChar * config.flipDuration) * 1000;
+                if (config.loop) {
+                    setTimeout(cycle, totalTime + config.cycleDelay);}}
+
+            cycle();
+        })();
+    </script>
+</body>
+</html>
